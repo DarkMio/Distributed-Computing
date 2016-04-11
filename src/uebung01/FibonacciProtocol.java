@@ -21,7 +21,24 @@ public class FibonacciProtocol {
         }
     }
 
-    public int processInput(int val) { // Extend for stronger protocols?
-        return fibonacci(val);
+    public String processInput(String val) { // Extend for stronger protocols?
+        try {
+            int value = Integer.parseInt(val);
+            return "Fibonacci of " + value + " is: " + fibonacci(value);
+        } catch(NumberFormatException e) {
+            return "Not a number or invalid number format, disposing...";
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

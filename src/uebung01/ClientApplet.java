@@ -6,9 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-/**
- * Created by Mio on 11.04.2016.
- */
 public class ClientApplet {
 
     public static void main(String[] args) {
@@ -22,11 +19,12 @@ public class ClientApplet {
             String fromServer;
             while ((fromServer = in.readLine()) != null) {
                 System.out.println("Server: " + fromServer);
-                if (fromServer.equals("Invalid number, disconnecting...")) {
+                if (fromServer.equals("Disconnecting...")) {
                     break;
                 }
                 String fromUser;
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                System.out.print("Input> ");
                 fromUser = input.readLine();
                 if (fromUser != null) {
                     System.out.println("Client: " + fromUser);
