@@ -41,7 +41,6 @@ public class FibonacciProtocol {
                     return -1;
             }
         }
-        return 0;
     }
 }
 
