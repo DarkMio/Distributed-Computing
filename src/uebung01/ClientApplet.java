@@ -34,18 +34,14 @@ public class ClientApplet {
                 System.out.print("Input> ");
                 fromUser = input.readLine();
                 if(fromUser != null) {
-                    int data = 0;
-                    while(true) {
-                        System.out.print("Input> ");
-                        fromUser = input.readLine();
-                        data = FibonacciProtocol.processInput(fromUser);
-                        if(data >= 0) {
-                            break;
-                        }
+                    int data = FibonacciProtocol.processInput(fromUser);
+                    if(data >= 0) {
+                        dos.write(data);
+                        int fromServerResponse = dis.read();
+                        System.out.println(fromServerResponse);
+                    } else if(data == -5){
+                        break;
                     }
-                    dos.write(data);
-                    int fromServerResponse = dis.read();
-                    System.out.println(fromServerResponse);
                 } else {
                     break;
                 }
