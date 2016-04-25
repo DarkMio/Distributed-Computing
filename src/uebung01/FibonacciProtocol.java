@@ -36,7 +36,7 @@ public class FibonacciProtocol {
                     int returnVal = processFibonacci(number);
                     return returnVal;
                 case "ende":
-                    break;
+                    return -5;
                 default:
                     return -1;
             }
