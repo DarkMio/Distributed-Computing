@@ -23,11 +23,11 @@ public class ServerApplet {
             FibonacciProtocol fib = new FibonacciProtocol();
             out.println("Connected to FAAS (Fibonacci As A Service) | exit or quit to disconnect.");
             while ((inputLine = in.readLine()) != null) {
-                if (inputLine.contains("exit") || inputLine.contains("quit")) {
-                    out.println("Disconnecting...");
+                final String returnVal = fib.processInput(inputLine);
+                out.println(returnVal); // actual output
+                if(returnVal.equals("Exiting...")) {
                     break;
                 }
-                out.println(fib.processInput(inputLine));
             }
             serverSocket.close();
         } catch (SocketException e) {

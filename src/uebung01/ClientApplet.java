@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientApplet {
 
@@ -19,7 +20,7 @@ public class ClientApplet {
             String fromServer;
             while ((fromServer = in.readLine()) != null) {
                 System.out.println("Server: " + fromServer);
-                if (fromServer.equals("Disconnecting...")) {
+                if (fromServer.equals("Exiting...")) {
                     break;
                 }
                 String fromUser;
@@ -32,6 +33,8 @@ public class ClientApplet {
                 }
             }
             kkSocket.close();
+        } catch (SocketException e) {
+            System.err.println("Server forcibly closed the connection");
         } catch (IOException e) {
             e.printStackTrace();
         }

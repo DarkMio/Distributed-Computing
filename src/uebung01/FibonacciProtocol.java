@@ -11,6 +11,15 @@ public class FibonacciProtocol {
         }
     }
 
+    public static String processFibonacci(final String input) {
+        try{
+            int value = Integer.parseInt(input);
+            return "Fibonacci of " + value + " is: " + fibonacci(value);
+        } catch(NumberFormatException e) {
+            return "Not a number or invalid number format, disposing...";
+        }
+    }
+
     public static int fibonacci(final int input) {
         if(input <= 0) {
             return 0;
@@ -21,13 +30,33 @@ public class FibonacciProtocol {
         }
     }
 
-    public String processInput(String val) { // Extend for stronger protocols?
-        try {
-            int value = Integer.parseInt(val);
-            return "Fibonacci of " + value + " is: " + fibonacci(value);
-        } catch(NumberFormatException e) {
-            return "Not a number or invalid number format, disposing...";
+    private static String help() {
+        return "Welcome to Fibonacci As A Service. " +
+                "It seems like you got confused, so here is a help file for you: " +
+                "hilfe : prints this help | " +
+                "berechne <number> : calculates the fibonacci number | " +
+                "ende : closes the connection";
+    }
+
+    public String processInput(final String val) { // Extend for stronger protocols?
+
+        final String[] input = val.split(" ");
+        if (input.length < 1) {
+            return "Invalid data";
+        } else {
+            switch (input[0].toLowerCase()) {
+                case "hilfe":
+                    return help();
+                case "berechne":
+                    String number = input.length > 1 ? input[1] : "";
+                    return processFibonacci(number);
+                case "ende":
+                    return "Exiting...";
+                default:
+                    return "No valid parameter given, have you tried 'help'?";
+            }
         }
+
     }
 }
 
