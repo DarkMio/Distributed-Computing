@@ -1,25 +1,21 @@
 package uebung01;
 
-/**
- * Created by Mio on 11.04.2016.
- */
 public class FibonacciProtocol {
 
 
     public static int processFibonacci(final String input) {
         try{
-            int value = Integer.parseInt(input);
-            return value;
+            return Integer.parseInt(input);
         } catch(NumberFormatException e) {
             return -2;
         }
     }
 
     private static void help() {
-        System.out.println("Welcome to Fibonacci As A Service. " +
-                "It seems like you got confused, so here is a help file for you: " +
-                "hilfe : prints this help | " +
-                "berechne <number> : calculates the fibonacci number | " +
+        System.out.println("Welcome to Fibonacci As A Service.\n" +
+                "It seems like you got confused, so here is a help file for you:\n" +
+                "hilfe : prints this help\n" +
+                "berechne <number> : calculates the fibonacci number\n" +
                 "ende : closes the connection");
     }
 
@@ -33,12 +29,12 @@ public class FibonacciProtocol {
                     help();
                 case "berechne":
                     String number = input.length > 1 ? input[1] : "";
-                    int returnVal = processFibonacci(number);
-                    return returnVal;
+                    return processFibonacci(number);
                 case "ende":
-                    return -5;
+                    return Integer.MIN_VALUE;
                 default:
-                    return -1;
+                    System.out.println("Not a command, try the help with: hilfe");
+                    return Integer.MAX_VALUE;
             }
         }
     }

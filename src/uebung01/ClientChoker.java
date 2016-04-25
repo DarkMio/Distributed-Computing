@@ -4,7 +4,10 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class ClientApplet {
+/**
+ * Created by Mio on 25.04.2016.
+ */
+public class ClientChoker {
 
     public static void main(String[] args) {
         String hostName;
@@ -34,15 +37,10 @@ public class ClientApplet {
                 System.out.print("Input> ");
                 fromUser = input.readLine();
                 if(fromUser != null) {
-                    int data = FibonacciProtocol.processInput(fromUser);
-                    if (data == Integer.MIN_VALUE) {
-                        break;
-                    } else if(data == Integer.MAX_VALUE) {
-                        continue;
-                    } else {
-                        dos.writeInt(data);
-                        int fromServerResponse = dis.readInt();
-                        output(fromServerResponse);
+                    out.println("Choke the server to its sudden death.");
+
+                    for(int i = 0; i < 150; i++) {
+                        System.out.println(in.read());
                     }
                 } else {
                     break;
@@ -57,12 +55,4 @@ public class ClientApplet {
         }
     }
 
-    private static void output(int data) {
-        System.out.print("> Server: ");
-        if(data == -2) {
-            System.out.println("Input is outside of viable number range");
-        } else {
-            System.out.println("Result is " + data);
-        }
-    }
 }

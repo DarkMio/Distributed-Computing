@@ -35,6 +35,9 @@ public class ServerApplet {
     }
 
     public static int fibonacci(final int input) {
+        if(input < 0 || input > 25) {
+            return -2;
+        }
         if(input <= 0) {
             return 0;
         } else if(input == 1) {
