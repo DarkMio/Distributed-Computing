@@ -5,58 +5,43 @@ package uebung01;
  */
 public class FibonacciProtocol {
 
-    public static void main(String[] args) {
-        for(int i = 0; i < 10; i++) {
-            System.out.println(i + ": " + fibonacci(i));
-        }
-    }
 
-    public static String processFibonacci(final String input) {
+    public static int processFibonacci(final String input) {
         try{
             int value = Integer.parseInt(input);
-            return "Fibonacci of " + value + " is: " + fibonacci(value);
+            return value;
         } catch(NumberFormatException e) {
-            return "Not a number or invalid number format, disposing...";
+            return -2;
         }
     }
 
-    public static int fibonacci(final int input) {
-        if(input <= 0) {
-            return 0;
-        } else if(input == 1) {
-            return 1;
-        } else {
-            return fibonacci(input - 2) + fibonacci(input - 1);
-        }
-    }
-
-    private static String help() {
-        return "Welcome to Fibonacci As A Service. " +
+    private static void help() {
+        System.out.println("Welcome to Fibonacci As A Service. " +
                 "It seems like you got confused, so here is a help file for you: " +
                 "hilfe : prints this help | " +
                 "berechne <number> : calculates the fibonacci number | " +
-                "ende : closes the connection";
+                "ende : closes the connection");
     }
 
-    public String processInput(final String val) { // Extend for stronger protocols?
-
+    public static int processInput(final String val) { // Extend for stronger protocols?
         final String[] input = val.split(" ");
         if (input.length < 1) {
-            return "Invalid data";
+            return -1;
         } else {
             switch (input[0].toLowerCase()) {
                 case "hilfe":
-                    return help();
+                    help();
                 case "berechne":
                     String number = input.length > 1 ? input[1] : "";
-                    return processFibonacci(number);
+                    int returnVal = processFibonacci(number);
+                    return returnVal;
                 case "ende":
-                    return "Exiting...";
+                    break;
                 default:
-                    return "No valid parameter given, have you tried 'help'?";
+                    return -1;
             }
         }
-
+        return 0;
     }
 }
 

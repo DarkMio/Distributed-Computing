@@ -1,36 +1,55 @@
 package uebung01;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
 public class ClientApplet {
 
     public static void main(String[] args) {
-        String hostName = "127.0.0.1";
-        int portNumber = 6789;
-
+        String hostName;
+        int portNumber;
+        if(args.length >=2){
+            hostName = args[0];
+            portNumber = Integer.parseInt(args[1]);
+        } else if (args.length == 1){
+            hostName = args[0];
+            portNumber = 5678;
+        } else {
+            System.err.println("No IP in args");
+            System.exit(-1);
+            hostName = "";
+            portNumber = 0;
+        }
         try {
             Socket kkSocket = new Socket(hostName, portNumber);
             PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
-            String fromServer;
-            while ((fromServer = in.readLine()) != null) {
-                System.out.println("Server: " + fromServer);
-                if (fromServer.equals("Exiting...")) {
-                    break;
-                }
+            DataInputStream dis = new DataInputStream(kkSocket.getInputStream());
+            DataOutputStream dos = new DataOutputStream(kkSocket.getOutputStream());
+            while (true) {
+
                 String fromUser;
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.print("Input> ");
                 fromUser = input.readLine();
-                if (fromUser != null) {
-                    System.out.println("Client: " + fromUser);
-                    out.println(fromUser);
+                if(fromUser != null) {
+                    int data = 0;
+                    while(true) {
+                        System.out.print("Input> ");
+                        fromUser = input.readLine();
+                        data = FibonacciProtocol.processInput(fromUser);
+                        if(data >= 0) {
+                            break;
+                        }
+                    }
+                    dos.write(data);
+                    int fromServerResponse = dis.read();
+                    System.out.println(fromServerResponse);
+                } else {
+                    break;
                 }
+
             }
             kkSocket.close();
         } catch (SocketException e) {

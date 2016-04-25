@@ -1,9 +1,6 @@
 package uebung01;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -12,28 +9,38 @@ public class ServerApplet {
 
     public static void main(String[] args) {
         try {
-            ServerSocket serverSocket = new ServerSocket(6789);
+            ServerSocket serverSocket = new ServerSocket(5678);
             Socket clientSocket = serverSocket.accept();
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
+            DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
 
-            String inputLine, outputLine;
+            int input;
 
             // Initiate conversation with client
-            FibonacciProtocol fib = new FibonacciProtocol();
-            out.println("Connected to FAAS (Fibonacci As A Service) | exit or quit to disconnect.");
-            while ((inputLine = in.readLine()) != null) {
-                final String returnVal = fib.processInput(inputLine);
-                out.println(returnVal); // actual output
-                if(returnVal.equals("Exiting...")) {
+            System.out.println("Connected to FAAS (Fibonacci As A Service) | exit or quit to disconnect.");
+            while (true) {
+                input = dis.read();
+                if(input == -1) {
                     break;
                 }
+                int val = fibonacci(input);
+                dos.write(val);
             }
             serverSocket.close();
         } catch (SocketException e) {
             System.err.println("Socket is forcibly closed. Exiting...");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static int fibonacci(final int input) {
+        if(input <= 0) {
+            return 0;
+        } else if(input == 1) {
+            return 1;
+        } else {
+            return fibonacci(input - 2) + fibonacci(input - 1);
         }
     }
 }
