@@ -36,8 +36,8 @@ public class ClientApplet {
                 if(fromUser != null) {
                     int data = FibonacciProtocol.processInput(fromUser);
                     if(data >= 0) {
-                        dos.write(data);
-                        int fromServerResponse = dis.read();
+                        dos.writeInt(data);
+                        int fromServerResponse = dis.readInt();
                         System.out.println(fromServerResponse);
                     } else if(data == -5){
                         break;

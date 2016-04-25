@@ -19,12 +19,12 @@ public class ServerApplet {
             // Initiate conversation with client
             System.out.println("Connected to FAAS (Fibonacci As A Service) | exit or quit to disconnect.");
             while (true) {
-                input = dis.read();
+                input = dis.readInt();
                 if(input == -1) {
                     break;
                 }
                 int val = fibonacci(input);
-                dos.write(val);
+                dos.writeInt(val);
             }
             serverSocket.close();
         } catch (SocketException e) {
