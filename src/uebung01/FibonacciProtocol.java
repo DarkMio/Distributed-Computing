@@ -7,7 +7,8 @@ public class FibonacciProtocol {
         try{
             return Integer.parseInt(input);
         } catch(NumberFormatException e) {
-            return -2;
+            System.out.println("Not a known number format");
+            return Integer.MAX_VALUE;
         }
     }
 
@@ -27,6 +28,7 @@ public class FibonacciProtocol {
             switch (input[0].toLowerCase()) {
                 case "hilfe":
                     help();
+                    return Integer.MAX_VALUE;
                 case "berechne":
                     String number = input.length > 1 ? input[1] : "";
                     return processFibonacci(number);
@@ -39,15 +41,3 @@ public class FibonacciProtocol {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-

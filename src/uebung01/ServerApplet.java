@@ -14,12 +14,9 @@ public class ServerApplet {
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
 
-            int input;
-
             // Initiate conversation with client
-            System.out.println("Connected to FAAS (Fibonacci As A Service) | exit or quit to disconnect.");
             while (true) {
-                input = dis.readInt();
+                int input = dis.readInt();
                 if(input == -1) {
                     break;
                 }
@@ -27,6 +24,7 @@ public class ServerApplet {
                 dos.writeInt(val);
             }
             serverSocket.close();
+            System.out.println("Closing server connection");
         } catch (SocketException e) {
             System.err.println("Socket is forcibly closed. Exiting...");
         } catch (IOException e) {

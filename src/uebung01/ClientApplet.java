@@ -18,17 +18,14 @@ public class ClientApplet {
         } else {
             System.err.println("No IP in args");
             System.exit(-1);
-            hostName = "";
-            portNumber = 0;
+            hostName = "";  //Makes inspection & compiler warnings happy
+            portNumber = 0; // about uninitialized variables down below
         }
         try {
-            Socket kkSocket = new Socket(hostName, portNumber);
-            PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
-            DataInputStream dis = new DataInputStream(kkSocket.getInputStream());
-            DataOutputStream dos = new DataOutputStream(kkSocket.getOutputStream());
+            Socket socket = new Socket(hostName, portNumber);
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
             while (true) {
-
                 String fromUser;
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.print("Input> ");
@@ -39,17 +36,15 @@ public class ClientApplet {
                         break;
                     } else if(data == Integer.MAX_VALUE) {
                         continue;
-                    } else {
-                        dos.writeInt(data);
-                        int fromServerResponse = dis.readInt();
-                        output(fromServerResponse);
                     }
+                    dos.writeInt(data);
+                    int fromServerResponse = dis.readInt();
+                    output(fromServerResponse);
                 } else {
                     break;
                 }
-
             }
-            kkSocket.close();
+            socket.close();
         } catch (SocketException e) {
             System.err.println("Server forcibly closed the connection");
         } catch (IOException e) {
@@ -58,7 +53,7 @@ public class ClientApplet {
     }
 
     private static void output(int data) {
-        System.out.print("> Server: ");
+        System.out.print("Server> ");
         if(data == -2) {
             System.out.println("Input is outside of viable number range");
         } else {
