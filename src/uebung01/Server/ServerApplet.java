@@ -1,4 +1,4 @@
-package uebung01;
+package uebung01.Server;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -7,9 +7,11 @@ import java.net.SocketException;
 
 public class ServerApplet {
 
+    public static final int PORT = 5678;
+
     public static void main(String[] args) {
         try {
-            ServerSocket serverSocket = new ServerSocket(5678);
+            ServerSocket serverSocket = new ServerSocket(PORT);
             Socket clientSocket = serverSocket.accept();
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());

@@ -1,4 +1,4 @@
-package uebung01;
+package uebung01.Client;
 
 public class FibonacciProtocol {
 

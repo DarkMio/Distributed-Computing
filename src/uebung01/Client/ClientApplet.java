@@ -1,4 +1,4 @@
-package uebung01;
+package uebung01.Client;
 
 import java.io.*;
 import java.net.Socket;
@@ -30,11 +30,11 @@ public class ClientApplet {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.print("Input> ");
                 fromUser = input.readLine();
-                if(fromUser != null) {
+                if (fromUser != null) {
                     int data = FibonacciProtocol.processInput(fromUser);
                     if (data == Integer.MIN_VALUE) {
                         break;
-                    } else if(data == Integer.MAX_VALUE) {
+                    } else if (data == Integer.MAX_VALUE) {
                         continue;
                     }
                     dos.writeInt(data);
@@ -45,6 +45,8 @@ public class ClientApplet {
                 }
             }
             socket.close();
+        } catch (ProtocolException e) {
+            System.err.println(e.getMessage());
         } catch (SocketException e) {
             System.err.println("Server forcibly closed the connection");
         } catch (IOException e) {
@@ -52,10 +54,10 @@ public class ClientApplet {
         }
     }
 
-    private static void output(int data) {
+    private static void output(int data) throws ProtocolException {
         System.out.print("Server> ");
-        if(data == -2) {
-            System.out.println("Input is outside of viable number range");
+        if(data < 0) {
+            throw new ProtocolException(data);
         } else {
             System.out.println("Result is " + data);
         }

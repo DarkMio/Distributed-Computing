@@ -1,4 +1,4 @@
-package uebung01;
+package uebung01.Client;
 
 import java.io.*;
 import java.net.Socket;
@@ -27,5 +27,4 @@ public class ClientChoker {
             e.printStackTrace();
         }
     }
-
 }
