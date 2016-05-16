@@ -12,28 +12,25 @@ import java.util.List;
 
 public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
 
+    public static final int PORT = 1337;
+    public static String serviceName = "pinnwand";
+    private final static String PASSWORD = "null";
+    private List<Message> messages;
+    private final static long MAX_TTL = 1000L * 10L; // 60L * 10L; // 1000 ms = 1s * 60 = 1m * 10 = 10 minutes
+    private final static int MAX_NUM_MSGS = 10;
+
     public static void main(String args[]) {
         try {
             Runtime.getRuntime().exec("rmiregistry");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Registry registry;
-
-        Pinnwand pinnwand;
 
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
         try {
-            /*
-            if (args.length  > 0)
-                registry = LocateRegistry.getRegistry(args[0]);
-            else
-                registry = LocateRegistry.getRegistry("localhost");
-            */
-
-            registry = LocateRegistry.createRegistry(1337);
+            Registry registry = LocateRegistry.createRegistry(PORT);
             Pinnwand pws = new PinnwandServer();
             registry.bind(serviceName, pws);
 
@@ -42,11 +39,7 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
         }
     }
 
-    public static String serviceName = "pinnwand";
-    final static String PASSWORD = "null";
-    List<Message> messages;
-    final static long MAX_TTL = 1000L * 10L; // 60L * 10L; // 1000 ms = 1s * 60 = 1m * 10 = 10 minutes
-    final static int MAX_NUM_MSGS = 10;
+
 
     public PinnwandServer() throws RemoteException {
         messages = new ArrayList<>();
@@ -71,7 +64,7 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
         deleteOldMessages();
         String[] output = new String[messages.size()];
         for(int i = 0; i < messages.size(); i++) {
-            output[i] = (String) messages.get(i).message;
+            output[i] = messages.get(i).message;
         }
         return output;
     }
@@ -81,7 +74,7 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
         if(index + 1 > MAX_NUM_MSGS || index + 1 > messages.size()) {
             return null;
         }
-        return (String) messages.get(index).message;
+        return messages.get(index).message;
     }
 
     @Override

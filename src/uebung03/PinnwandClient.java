@@ -7,10 +7,14 @@ import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 public class PinnwandClient {
+
+    public static final int PORT = 1337;
+    public static final String HOST = "127.0.0.1";
+
     public static void main(String args[]) {
         try {
             String name = "pinnwand";
-            Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1337);
+            Registry registry = LocateRegistry.getRegistry(HOST, PORT);
             Pinnwand pinnwand = (Pinnwand) registry.lookup(name);
             Scanner in = new Scanner(System.in);
             String input;
