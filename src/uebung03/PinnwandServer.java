@@ -37,17 +37,15 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
             Pinnwand pws = new PinnwandServer();
             registry.bind(serviceName, pws);
 
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (AlreadyBoundException e) {
+        } catch (RemoteException | AlreadyBoundException e) {
             e.printStackTrace();
         }
     }
 
     public static String serviceName = "pinnwand";
     final static String PASSWORD = "null";
-    List<List<Object>> messages;
-    final static long MAX_TTL = 1000L * 60L * 10L; // 1000 ms = 1s * 60 = 1m * 10 = 10 minutes
+    List<Message> messages;
+    final static long MAX_TTL = 1000L * 10L; // 60L * 10L; // 1000 ms = 1s * 60 = 1m * 10 = 10 minutes
     final static int MAX_NUM_MSGS = 10;
 
     public PinnwandServer() throws RemoteException {
@@ -73,7 +71,7 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
         deleteOldMessages();
         String[] output = new String[messages.size()];
         for(int i = 0; i < messages.size(); i++) {
-            output[i] = (String) messages.get(i).get(0);
+            output[i] = (String) messages.get(i).message;
         }
         return output;
     }
@@ -83,7 +81,7 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
         if(index + 1 > MAX_NUM_MSGS || index + 1 > messages.size()) {
             return null;
         }
-        return (String) messages.get(index).get(0);
+        return (String) messages.get(index).message;
     }
 
     @Override
@@ -91,21 +89,40 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
         if(messages.size() >= MAX_NUM_MSGS) {
             return false;
         }
-        messages.add(
-                new ArrayList<Object>(){{
-                    add(msg);
-                    add(System.currentTimeMillis());
-                }}
-        );
+        messages.add(new Message(msg, System.currentTimeMillis()));
         return true;
     }
 
+    /**
+     * Searches downwards for all messages with timestamp being older than MAX_TTL
+     * Fastest implementation I could think of (although this might be overkill)
+     */
     private void deleteOldMessages() {
-        for (int i = 0; i < messages.size(); i++) {
-            List element = messages.get(i);
-            if ((long) element.get(1) < System.currentTimeMillis() - MAX_TTL) {
-                messages.remove(i); // cya
+        int i = messages.size() - 1;
+        boolean cut = false;
+        while(i >= 0) { // go from newest to oldest message
+            final Message element = messages.get(i);
+            if(element.timestamp < System.currentTimeMillis() - MAX_TTL) {
+                cut = true;
+                break;
             }
+            i--;
+        }
+        if(cut) { // slice array and replace
+            messages = messages.subList(i+1, messages.size());
+        }
+    }
+
+    /**
+     * Container Class for messages.
+     */
+    private class Message{
+        public final String message;
+        public final long timestamp;
+
+        public Message(String message, long timestamp) {
+            this.message = message;
+            this.timestamp = timestamp;
         }
     }
 }
