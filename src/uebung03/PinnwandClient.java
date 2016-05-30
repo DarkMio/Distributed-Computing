@@ -37,7 +37,11 @@ public class PinnwandClient {
         String[] commands = input.split(" ");
         switch(commands[0].toLowerCase()) {
             case "get":
-                get(commands[1], p);
+                if(commands.length > 1) {
+                    get(commands[1], p);
+                } else {
+                    help();
+                }
                 break;
             case "getall":
                 getAll(p);
@@ -78,7 +82,7 @@ public class PinnwandClient {
         if(p.putMessage(message)) {
             System.out.println("Message sent.");
         } else {
-            System.out.println("Message was not sent because the board is full.");
+            System.out.println("Message was not sent because the board is full or msg too long.");
         }
     }
 

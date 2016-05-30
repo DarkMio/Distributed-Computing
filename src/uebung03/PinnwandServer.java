@@ -2,9 +2,11 @@ package uebung03;
 
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,8 +18,12 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
     public static String serviceName = "pinnwand";
     private final static String PASSWORD = "null";
     private List<Message> messages;
-    private final static long MAX_TTL = 1000L * 10L; // 60L * 10L; // 1000 ms = 1s * 60 = 1m * 10 = 10 minutes
+    private final static long MAX_TTL = 1000L * 10L * 60L * 10L; // 1000 ms = 1s * 60 = 1m * 10 = 10 minutes
     private final static int MAX_NUM_MSGS = 10;
+    private final static int MAX_MSG_LEN = 160;
+
+    private final List<String> clients;
+
 
     public static void main(String args[]) {
         try {
@@ -43,24 +49,41 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
 
     public PinnwandServer() throws RemoteException {
         messages = new ArrayList<>();
+        clients = new ArrayList<>();
     }
 
     @Override
     public int login(String password) throws RemoteException {
         if(password.equals(PASSWORD)){
+            try {
+                clients.add(getClientHost());
+            } catch (ServerNotActiveException e) {
+                e.printStackTrace();
+            }
             return 1;
         } else {
             return -1;
         }
     }
 
+    private boolean validateClient() throws RemoteException {
+        try {
+            return clients.contains(getClientHost());
+        } catch (ServerNotActiveException e) {
+            e.printStackTrace();
+        }
+        throw new NotValidatedException();
+    }
+
     @Override
     public int getMessageCount() throws RemoteException {
+        validateClient();
         return messages.size();
     }
 
     @Override
     public String[] getMessages() throws RemoteException {
+        validateClient();
         deleteOldMessages();
         String[] output = new String[messages.size()];
         for(int i = 0; i < messages.size(); i++) {
@@ -71,6 +94,7 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
 
     @Override
     public String getMessage(int index) throws RemoteException {
+        validateClient();
         if(index + 1 > MAX_NUM_MSGS || index + 1 > messages.size()) {
             return null;
         }
@@ -79,7 +103,8 @@ public class PinnwandServer extends UnicastRemoteObject implements Pinnwand {
 
     @Override
     public boolean putMessage(String msg) throws RemoteException {
-        if(messages.size() >= MAX_NUM_MSGS) {
+        validateClient();
+        if(messages.size() >= MAX_NUM_MSGS || msg.length() > MAX_MSG_LEN) {
             return false;
         }
         messages.add(new Message(msg, System.currentTimeMillis()));
