@@ -11,7 +11,7 @@ public class ProtocolException extends Exception {
     private final int errorCode;
 
     public ProtocolException(int errorCode) {
-        super("Server exception happened.");
+        super("ServerImpl exception happened.");
         this.errorCode = errorCode;
     }
 

@@ -19,7 +19,7 @@ public class ClientApplet {
                     new InputStreamReader(kkSocket.getInputStream()));
             String fromServer;
             while ((fromServer = in.readLine()) != null) {
-                System.out.println("Server: " + fromServer);
+                System.out.println("ServerImpl: " + fromServer);
                 if (fromServer.equals("Bye."))
                     break;
                 String fromUser;

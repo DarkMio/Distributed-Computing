@@ -22,7 +22,7 @@ public class ClientChoker {
                 }
             }
         } catch (SocketException e) {
-            System.err.println("Server forcibly closed the connection");
+            System.err.println("ServerImpl forcibly closed the connection");
         } catch (IOException e) {
             e.printStackTrace();
         }

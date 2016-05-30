@@ -48,14 +48,14 @@ public class ClientApplet {
         } catch (ProtocolException e) {
             System.err.println(e.getMessage());
         } catch (SocketException e) {
-            System.err.println("Server forcibly closed the connection");
+            System.err.println("ServerImpl forcibly closed the connection");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private static void output(int data) throws ProtocolException {
-        System.out.print("Server> ");
+        System.out.print("ServerImpl> ");
         if(data < 0) {
             throw new ProtocolException(data);
         } else {
