@@ -19,7 +19,7 @@ public class ClientMessage {
         StringBuilder sb = new StringBuilder();
         sb.append("SEQ: ").append(sequenceNumber);
         sb.append(" | ").append("CMD: ").append(command);
-        sb.append(" | ").append("DATA: [");
+        sb.append(" | ").append("PARAMS: [");
         for(String s: params) {
             sb.append(s).append(", ");
         }

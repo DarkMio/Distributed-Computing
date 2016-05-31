@@ -16,6 +16,7 @@ public class MailImpl implements MailInterface {
     private static MailImpl instance;
     private MailImpl() {
         clients = new ArrayList<>();
+        notes = new ArrayList<>();
     }
 
     /**
@@ -125,5 +126,10 @@ public class MailImpl implements MailInterface {
         if(cut) { // slice array and replace
             notes = notes.subList(i+1, notes.size());
         }
+    }
+
+    public boolean isLoggedIn(ClientConnection client) {
+
+        return clients.contains(client);
     }
 }

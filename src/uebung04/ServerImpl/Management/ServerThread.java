@@ -21,38 +21,58 @@ public class ServerThread implements Runnable {
 
     @Override
     public void run() {
-        String message;
-        while((message = client.receiveMessage()) != null) {
-            ClientMessage cmsg = JSONConverter.deserializeClientRequest(message);
-            switch(cmsg.command.toLowerCase()) {
-                case "login":
-                    login(cmsg);
-                    break;
-                case "logout":
-                    logout(cmsg);
-                    return; // this kills the thread
-                case "who":
-                    who(cmsg);
-                    break;
-                case "time":
-                    time(cmsg);
-                    break;
-                case "ls":
-                    ls(cmsg);
-                    break;
-                case "chat":
-                    chat(cmsg);
-                    break;
-                case "notify":
-                    notify(cmsg);
-                    break;
-                case "note":
-                    note(cmsg);
-                    break;
-                case "notes":
-                    notes(cmsg);
-                    break;
+        try {
+            String message;
+            client.sendMessage(200, -1, new String[]{
+                    "Message of the Day\n" +
+                            "------------------\n" +
+                            "We're serving fish today! And not only fish, but chips too!\n" +
+                            "Combine them now to our tasty fish'n'chips menu at your next venue.\n" +
+                            "Welcome to DecreeNode - supporting fish and ships communities since 2016"
+            });
+            while ((message = client.receiveMessage()) != null) {
+                ClientMessage cmsg = JSONConverter.deserializeClientRequest(message);
+                System.out.println("RECV: " + cmsg);
+                if(!mail.isLoggedIn(client) && !cmsg.command.toLowerCase().equals("login")) {
+                    client.sendMessage(401, cmsg.sequenceNumber, new String[]{"Unauthorized: You may want to use login first"});
+                    return;
+                }
+                switch (cmsg.command.toLowerCase()) {
+                    case "login":
+                        login(cmsg);
+                        break;
+                    case "logout":
+                        logout(cmsg);
+                        return; // this kills the thread
+                    case "who":
+                        who(cmsg);
+                        break;
+                    case "time":
+                        time(cmsg);
+                        break;
+                    case "ls":
+                        ls(cmsg);
+                        break;
+                    case "chat":
+                        chat(cmsg);
+                        break;
+                    case "notify":
+                        notify(cmsg);
+                        break;
+                    case "note":
+                        note(cmsg);
+                        break;
+                    case "notes":
+                        notes(cmsg);
+                        break;
+                    default:
+                        notRecorgnized(cmsg);
+                        break;
+                }
             }
+        } catch (Exception | Error e) {
+            System.err.println("ERR : " + e);
+            e.printStackTrace();
         }
         System.out.println("INFO: Bye. Client disconnected with UUID: " + client.getUuid());
     }
@@ -90,7 +110,7 @@ public class ServerThread implements Runnable {
     }
 
     private void ls(ClientMessage cmsg) {
-        if(cmsg.params.length < 0) {
+        if(cmsg.params.length > 0) {
             List<String> ls = mail.ls(cmsg.params[0]);
             client.sendMessage(200, cmsg.sequenceNumber, ls.toArray(new String[ls.size()]));
             return;
@@ -99,7 +119,7 @@ public class ServerThread implements Runnable {
     }
 
     private void chat(ClientMessage cmsg) {
-        if(cmsg.params.length < 1) {
+        if(cmsg.params.length > 1) {
             if(mail.chat(cmsg.params[0], cmsg.params[1])){
                 client.sendMessage(204, cmsg.sequenceNumber, new String[]{});
                 return;
@@ -112,8 +132,9 @@ public class ServerThread implements Runnable {
     }
 
     private void notify(ClientMessage cmsg) {
-        if(cmsg.params.length < 0) {
-            if(mail.note(cmsg.params[0])) {
+        System.out.println(cmsg);
+        if(cmsg.params.length > 0) {
+            if(mail.notify(cmsg.params[0])) {
                 client.sendMessage(204, cmsg.sequenceNumber, new String[]{});
                 return;
             }
@@ -124,7 +145,7 @@ public class ServerThread implements Runnable {
     }
 
     private void note(ClientMessage cmsg) {
-        if(cmsg.params.length < 0) {
+        if(cmsg.params.length > 0) {
             mail.note(cmsg.params[0]);
             client.sendMessage(200, cmsg.sequenceNumber, new String[]{});
             return;
@@ -135,5 +156,9 @@ public class ServerThread implements Runnable {
     private void notes(ClientMessage cmsg) {
         List<String> notes = mail.notes();
         client.sendMessage(200, cmsg.sequenceNumber, notes.toArray(new String[notes.size()]));
+    }
+
+    private void notRecorgnized(ClientMessage cmsg) {
+        client.sendMessage(501, cmsg.sequenceNumber, new String[]{"Command " + cmsg.command + " is unknown"});
     }
 }

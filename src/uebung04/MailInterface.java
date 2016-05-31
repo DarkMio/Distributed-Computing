@@ -15,4 +15,5 @@ public interface MailInterface {
     boolean notify(String text);  // might need some identifier
     boolean note(String text);    // ^same applies here
     List<String> notes();
+    boolean isLoggedIn(ClientConnection user);
 }
