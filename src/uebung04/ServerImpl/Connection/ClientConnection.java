@@ -4,7 +4,6 @@ import uebung04.util.JSONSerializer.JSONConverter;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.UUID;
 
 public class ClientConnection {
@@ -14,9 +13,12 @@ public class ClientConnection {
     private String username;    // and the client gets a username at some point, too
     final private BufferedReader incoming;
     final private BufferedWriter outgoing;
+    public enum ConnectionState{online, offline};
+    public ConnectionState state;
 
     public ClientConnection(Socket clientSocket) throws IOException {
         this.clientSocket = clientSocket;
+        state = ConnectionState.online;
         uuid = UUID.randomUUID().toString();
         incoming = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         outgoing = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
@@ -32,6 +34,7 @@ public class ClientConnection {
             outgoing.write(message);
             return true;
         } catch (IOException e) {
+            state = ConnectionState.offline;
             return false;
         }
     }
@@ -48,6 +51,7 @@ public class ClientConnection {
         try {
             return incoming.readLine();
         } catch (IOException e) {
+            state = ConnectionState.offline;
             return null;
         }
     }
@@ -59,6 +63,7 @@ public class ClientConnection {
             System.err.println("I tried to close the client connection but I couldn't. :(");
             e.printStackTrace();
         }
+        state = ConnectionState.offline;
     }
 
     public String getUuid() {

@@ -1,80 +1,58 @@
 package uebung04;
 
+import uebung04.ServerImpl.Connection.ClientConnection;
+import uebung04.ServerImpl.Logic.MailImpl;
+import uebung04.ServerImpl.Management.ServerThread;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class Server implements Runnable{
-
-
-    public static final int PORT = 5678;
-
-    private Socket clientSocket;
-
-    public int getId() {
-        return id;
-    }
-
-    private int id;
-    public String username;
-
+public class Server{
+    private static final int PORT = 5678;
+    private static final int CONNECTION_POOL_SIZE = 5;
 
     public static void main(String[] args) {
-        int count = 0;
+
+        ExecutorService executor = Executors.newFixedThreadPool(CONNECTION_POOL_SIZE);
+        ArrayList<ClientConnection> connections = new ArrayList<>();
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);
             // Initiate conversation with client
+            System.out.println("Mail Service started and awaiting new clients.");
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                if(count > 5) {
-                    break;
+                ClientConnection conn = new ClientConnection(clientSocket);
+                connections = clearConnectionPool(connections);
+                if(connections.size() >= CONNECTION_POOL_SIZE) {
+                    conn.sendMessage(503, -1, new String[]{"Server too busy"}); // El Mao
+                    System.err.println("ERR : New client (" + conn.getUuid() +
+                            ") tried to connect, but there are no free sockets.");
+                    continue;
                 }
-                Runnable runnable = new Server(clientSocket, ++count);
-                Thread thread = new Thread(runnable);
-                thread.start();
-                thread.run();
-              /*  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                DataOutputStream outToClient = new DataOutputStream(clientSocket.getOutputStream());
-                String read = in.readLine();
-                System.err.println(read);
-                if(read != null){
+                Runnable runnable = new ServerThread(conn);
+                executor.execute(runnable);
+                connections.add(conn);
 
-                    String test = "String accepted";
-                    outToClient.writeBytes(test + "\n");
-                } */
+                System.out.println("INFO: New Client connected with uuid: " + conn.getUuid());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    Server(Socket s, int i){
-        this.clientSocket = s;
-        System.out.println(s.getInetAddress());
-        System.out.println(s.getLocalAddress());
-        this.id = i;
-    }
-
-    public void run(){
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            DataOutputStream outToClient = new DataOutputStream(clientSocket.getOutputStream());
-            String read = in.readLine();
-            System.err.println(read);
-            if(read != null){
-
-                String test = "String accepted";
-                outToClient.writeBytes(test + "\n");
+    private static ArrayList<ClientConnection> clearConnectionPool(ArrayList<ClientConnection> connections) {
+        for(int i = 0; i < connections.size(); i++) {
+            ClientConnection c = connections.get(i);
+            if(c.state == ClientConnection.ConnectionState.offline) {
+                connections.remove(c);
             }
-            try {
-                Thread.sleep(10000);
-            }
-            catch (Exception e) {
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        return connections;
     }
 }

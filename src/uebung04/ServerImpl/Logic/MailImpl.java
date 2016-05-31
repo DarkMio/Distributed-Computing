@@ -3,7 +3,6 @@ package uebung04.ServerImpl.Logic;
 import uebung04.MailInterface;
 import uebung04.Server;
 import uebung04.ServerImpl.Connection.ClientConnection;
-import uebung04.ServerImpl.Connection.NetworkDispatcher;
 import uebung04.ServerImpl.Management.ServerThread;
 
 import java.util.ArrayList;
@@ -15,8 +14,9 @@ public class MailImpl implements MailInterface {
     private List<Note> notes;
     private List<ClientConnection> clients;
     private static MailImpl instance;
-    private NetworkDispatcher networking;
-    private MailImpl() {}
+    private MailImpl() {
+        clients = new ArrayList<>();
+    }
 
     /**
      * This singleton allows us to share all complex logic between all thread
@@ -85,10 +85,9 @@ public class MailImpl implements MailInterface {
 
     @Override
     public boolean notify(String text) {
-        if(networking == null) {
-            return false;
+        for(ClientConnection client : clients) {
+            client.sendMessage(200, -1, new String[]{text});
         }
-        networking.sendToAll(200, -1, new String[]{text});
         return true;
     }
 
@@ -126,9 +125,5 @@ public class MailImpl implements MailInterface {
         if(cut) { // slice array and replace
             notes = notes.subList(i+1, notes.size());
         }
-    }
-
-    public void setNetworking(NetworkDispatcher networking) {
-        this.networking = networking;
     }
 }

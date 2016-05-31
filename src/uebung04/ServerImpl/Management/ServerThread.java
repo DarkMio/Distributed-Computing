@@ -54,6 +54,7 @@ public class ServerThread implements Runnable {
                     break;
             }
         }
+        System.out.println("INFO: Bye. Client disconnected with UUID: " + client.getUuid());
     }
 
     private void login(ClientMessage cmsg) {
