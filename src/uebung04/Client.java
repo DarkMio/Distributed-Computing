@@ -8,9 +8,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-/**
- * Created by Mio on 30.05.2016.
- */
 public class Client {
 
     public static void main(String[] args) {

@@ -5,17 +5,21 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
-/**
- * Created by Mio on 30.05.2016.
- */
-
 public class Server implements Runnable{
 
 
     public static final int PORT = 5678;
 
     private Socket clientSocket;
-    private int ID;
+
+    public int getId() {
+        return id;
+    }
+
+    private int id;
+    public String username;
+
+
     public static void main(String[] args) {
         int count = 0;
         try {
@@ -47,7 +51,9 @@ public class Server implements Runnable{
 
     Server(Socket s, int i){
         this.clientSocket = s;
-        this.ID = i;
+        System.out.println(s.getInetAddress());
+        System.out.println(s.getLocalAddress());
+        this.id = i;
     }
 
     public void run(){
