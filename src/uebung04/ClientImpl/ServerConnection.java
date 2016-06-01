@@ -1,9 +1,13 @@
 package uebung04.ClientImpl;
 
+import com.google.gson.JsonObject;
+import uebung04.util.JSONSerializer.ClientMessage;
 import uebung04.util.JSONSerializer.JSONConverter;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class ServerConnection {
@@ -14,6 +18,7 @@ public class ServerConnection {
     final private BufferedReader incoming;
     final private BufferedWriter outgoing;
     public ConnectionState state;
+    private List<ClientMessage> sentMessages;
 
     public ServerConnection(Socket clientSocket) throws IOException {
         this.clientSocket = clientSocket;
@@ -21,6 +26,7 @@ public class ServerConnection {
         uuid = UUID.randomUUID().toString();
         incoming = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         outgoing = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+        sentMessages = new ArrayList<>();
     }
 
     /**
@@ -32,7 +38,7 @@ public class ServerConnection {
         try {
             outgoing.write(message);
             outgoing.flush();
-            System.err.print("SENT: " + message);
+            // System.err.print("SENT: " + message);
             return true;
         } catch (IOException e) {
             state = ConnectionState.offline;
@@ -41,7 +47,10 @@ public class ServerConnection {
     }
 
     public boolean sendMessage(int sequenceNumber, String command, String[] data) {
-        return sendMessage(JSONConverter.serializeClientRequest(sequenceNumber, command, data).toString() + "\n");
+        JsonObject jso = JSONConverter.serializeClientRequest(sequenceNumber, command, data);
+        ClientMessage cm = JSONConverter.deserializeClientRequest(jso);
+        sentMessages.add(cm);
+        return sendMessage(jso.toString() + "\n");
     }
 
     /**
@@ -77,6 +86,10 @@ public class ServerConnection {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<ClientMessage> getSentMessages() {
+        return sentMessages;
     }
 
 }

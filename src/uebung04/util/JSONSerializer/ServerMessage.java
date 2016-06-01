@@ -1,9 +1,9 @@
 package uebung04.util.JSONSerializer;
 
 public class ServerMessage {
-    final int statusCode;
-    final int sequenceNumber;
-    final String[] data;
+    public final int statusCode;
+    public final int sequenceNumber;
+    public final String[] data;
 
     public ServerMessage(int statusCode, int sequenceNumber, String[] data) {
         this.statusCode = statusCode;

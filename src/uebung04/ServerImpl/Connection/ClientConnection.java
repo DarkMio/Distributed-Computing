@@ -4,6 +4,7 @@ import uebung04.util.JSONSerializer.JSONConverter;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.UUID;
 
 public class ClientConnection {
@@ -12,7 +13,7 @@ public class ClientConnection {
     final private String uuid;  // we give the client a unique username
     private String username;    // and the client gets a username at some point, too
     final private BufferedReader incoming;
-    final private PrintWriter outgoing;
+    final private BufferedWriter outgoing;
     public ConnectionState state;
 
     public ClientConnection(Socket clientSocket) throws IOException {
@@ -20,7 +21,7 @@ public class ClientConnection {
         state = ConnectionState.online;
         uuid = UUID.randomUUID().toString();
         incoming = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        outgoing = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+        outgoing = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
     }
 
     /**
@@ -29,10 +30,16 @@ public class ClientConnection {
      * @return yields true if sent, false if it failed.
      */
     public boolean sendMessage(String message) {
-        outgoing.write(message);
-        outgoing.flush();
-        System.err.print("SENT: " + message);
-        return true;
+        try {
+            outgoing.write(message);
+            outgoing.flush();
+            System.err.print("SENT: " + message);
+            return true;
+        } catch (IOException e) {
+            state = ConnectionState.offline;
+            //e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean sendMessage(int statusCode, int sequenceNumber, String[] data) {

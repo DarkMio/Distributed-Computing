@@ -6,9 +6,6 @@ import uebung04.util.JSONSerializer.ServerMessage;
 
 import java.util.List;
 
-/**
- * Created by Mio on 31-May-16.
- */
 public class ClientReceiverThread implements Runnable {
 
     private final List<ServerMessage> queue;
