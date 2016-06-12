@@ -6,6 +6,7 @@ import uebung04.ServerImpl.Connection.ClientConnection;
 import uebung04.ServerImpl.Management.ServerThread;
 import uebung04.util.JSONSerializer.ClientMessage;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,16 +69,21 @@ public class MailImpl implements MailInterface {
 
     @Override
     public List<String> ls(String path) {
-        return new ArrayList<String>(){{
-            add("Not");
-            add("Sure");
-            add("What");
-            add("This");
-            add("Is");
-            add("'sposed");
-            add("to");
-            add("do");
-        }};
+        File probablyFolder = new File(path);
+        if(probablyFolder.isDirectory()) {
+            File[] files = probablyFolder.listFiles();
+            ArrayList<String> filenames = new ArrayList<>();
+            for (File file: files) {
+                if(file.isFile()) {
+                    filenames.add("F: " + file.getName());
+                } else if(file.isDirectory()) {
+                    filenames.add("D: " + file.getName());
+                }
+            }
+            return filenames;
+        }
+
+        return new ArrayList<String>();
     }
 
     @Override
