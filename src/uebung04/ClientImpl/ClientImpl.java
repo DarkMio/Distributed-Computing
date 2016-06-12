@@ -34,6 +34,10 @@ public class ClientImpl {
     }
 
     private void handleResponse(ClientMessage original, ServerMessage response) {
+        if(!(response.statusCode == 200) && !(response.statusCode == 204)) {
+            String msg = dataConcat(response.data, " | ");
+            System.err.println("An error occured: " + msg);
+        }
         switch(original.command.toLowerCase()) {
             case "login":
                 System.out.println(response.data[0]);

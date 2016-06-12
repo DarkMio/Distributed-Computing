@@ -20,10 +20,18 @@ public class ClientReceiverThread implements Runnable {
 
     @Override
     public void run() {
-        String message;
-        while((message = connection.receiveMessage()) != null) {
-            queue.add(JSONConverter.deserializeServerResponse(message));
-            client.newResponse();
+        try {
+            String message;
+            while ((message = connection.receiveMessage()) != null) {
+                if (connection.state == ServerConnection.ConnectionState.offline) {
+                    break;
+                }
+                queue.add(JSONConverter.deserializeServerResponse(message));
+                client.newResponse();
+            }
+        } catch (Exception e) {
+            connection.state = ServerConnection.ConnectionState.offline;
+            System.out.println(e.toString());
         }
     }
 }

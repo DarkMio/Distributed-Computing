@@ -4,6 +4,7 @@ import uebung04.MailInterface;
 import uebung04.Server;
 import uebung04.ServerImpl.Connection.ClientConnection;
 import uebung04.ServerImpl.Management.ServerThread;
+import uebung04.util.JSONSerializer.ClientMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +33,9 @@ public class MailImpl implements MailInterface {
     }
 
     @Override
-    public boolean login(ClientConnection user) {
+    public boolean login(ClientMessage msg, ClientConnection user) {
         for(ClientConnection s: clients) {
-            if(s.getUsername().equals(user.getUsername())) {
+            if(s.getUsername().equals(msg.params[0])) {
                 return false;
             }
         }
@@ -44,8 +45,15 @@ public class MailImpl implements MailInterface {
 
     @Override
     public synchronized boolean logout(ClientConnection user) {
-        clients.remove(user);
-        return true;
+        for(int i = 0; i < clients.size(); i++) {
+            ClientConnection c = clients.get(0);
+            System.out.println(c.getUsername() + " " + user.getUsername());
+            if(c.getUsername().equals(user.getUsername())) {
+                clients.remove(c);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -76,12 +84,12 @@ public class MailImpl implements MailInterface {
     public boolean chat(String username, String message) {
         boolean exists = false;
         for(ClientConnection s: clients) {
-            exists = s.getUsername().equals(username);
-            if(exists) {
-                break;
+            if(s.getUsername().equals(username)) {
+                s.sendMessage(200, -1, new String[]{message});
+                return true;
             }
         }
-        return exists;
+        return false;
     }
 
     @Override

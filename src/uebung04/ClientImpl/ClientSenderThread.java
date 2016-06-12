@@ -22,6 +22,9 @@ public class ClientSenderThread implements Runnable {
     public void run() {
         try {
             while (true) {
+                if(connection.state == ServerConnection.ConnectionState.offline) {
+                    break;
+                }
                 final String in = input.readLine();
                 final String[] params = in.split(" ");
                 if (params.length < 1) {
@@ -36,7 +39,8 @@ public class ClientSenderThread implements Runnable {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            connection.state = ServerConnection.ConnectionState.offline;
+            System.out.println(e.toString());
         }
     }
 

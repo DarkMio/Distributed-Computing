@@ -2,11 +2,12 @@ package uebung04;
 
 import uebung04.ServerImpl.Connection.ClientConnection;
 import uebung04.ServerImpl.Management.ServerThread;
+import uebung04.util.JSONSerializer.ClientMessage;
 
 import java.util.List;
 
 public interface MailInterface {
-    boolean login(ClientConnection user);
+    boolean login(ClientMessage msg, ClientConnection user);
     boolean logout(ClientConnection user);
     List<ClientConnection> who();
     long time();

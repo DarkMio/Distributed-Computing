@@ -79,7 +79,7 @@ public class ServerThread implements Runnable {
 
     private void login(ClientMessage cmsg) {
         if(cmsg.params.length > 0 && client.getUsername() == null) { // so this shitter has no name and wants a name
-            if(mail.login(client)) {
+            if(mail.login(cmsg, client)) {
                 client.setUsername(cmsg.params[0]); // the fuck do I care what he wrote as username(s), he gets the first
                 client.sendMessage(200, cmsg.sequenceNumber, new String[]{"Login successful."});
                 return;
@@ -91,6 +91,7 @@ public class ServerThread implements Runnable {
     }
 
     private void logout(ClientMessage cmsg) {
+        mail.logout(client);
         client.sendMessage(204, cmsg.sequenceNumber, new String[]{});
         client.closeConnection();
     }
